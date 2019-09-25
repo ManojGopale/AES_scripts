@@ -2,7 +2,7 @@ import tensorflow as tf
 from keras.models import Sequential, load_model
 from keras.layers.core import Dense, Activation, Dropout
 from keras.utils import np_utils
-#from keras.callbacks import CSVLogger, TensorBoard, ModelCheckpoint, EarlyStopping
+from keras.callbacks import CSVLogger, TensorBoard, ModelCheckpoint, EarlyStopping
 ## ModelCheckPoint is written in newCallBacks
 from keras.callbacks import CSVLogger, TensorBoard
 import pickle
@@ -13,100 +13,124 @@ import gc
 from datetime import date, datetime
 
 from sklearn.utils import shuffle
-import sklearn
+import sklearn, random
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
 from keras.models import clone_model
 from keras.models import load_model
 
-# Path where new EarlyStopping and ModelCheckPoint_every_10epochs is written
-import sys
-sys.path.insert(0, '/extra/manojgopale/AES_data/')
+import scipy.io as si
+import argparse
+import time
 
-import newCallBacks
+## Dir 
+runDir = "/xdisk/manojgopale/AES/dataCollection/"
 
 np.random.seed(9)
-
 scaler = StandardScaler()
-def process_inputs (dataPath):
-	data = pd.read_csv(dataPath, header=None)
+def process_inputs (data):
+	#data = pd.read_csv(dataPath, header=None)
 	dataShuffle = shuffle(data)
 	x_data_shuffle = dataShuffle.iloc[:,0:-1]
 	y_data = dataShuffle.iloc[:,-1]
 	x_data = scaler.fit_transform(x_data_shuffle)
 	return x_data, y_data
 
-## dataPath : Path where the working directory is located. 
-## trainSize : Number of power traces per key to take
-def getData(dataPath, trainSize):
-	## Getting data from matlab stored files
-	runDir = "/xdisk/manojgopale/AES/dataCollection/matResult/config4p3/"
-	keyStr = runDir + "value237.mat"
+## config: the configuration for which data is to be generated 
+## trainSize (4000) : Number of power traces per key to take
+def getData(config, trainSize):
 
-	## Loading data from matlab files
-	keyData = si.loadmat(keyStr)
+	## runDir
+	runDir = "/xdisk/manojgopale/AES/dataCollection/"
 
-	## Get random sample and use it to create dataset
-	for index in random.sample(range(500), 3):
-		keyStr = runDir + "value" + index + ".mat"
-
-		## Loading data from matlab files
-		keyData = si.loadmat(keyStr)
-
-	runDir = dataPath
-	dataDir = runDir + "/data/"
-	devSize  = 1000
-	testSize = 1000
-
-	## Pre defining the arrays based on sizes of the data
-	x_train = np.zeros((trainSize*4*64, 1361))
-	x_dev = np.zeros((devSize*4*64, 1361))
-	x_test = np.zeros((testSize*4*64, 1361))
-
-	y_train = np.zeros((trainSize*4*64, 1))
-	y_dev = np.zeros((devSize*4*64, 1))
-	y_test = np.zeros((testSize*4*64, 1))
-
-	for index, val in enumerate([1,0,3,2]):
-		print("Started data processing for %d set\n" %(val))
-		trainStr = dataDir + "aesData_config9_Train_" + str(val) + ".csv"
-		devStr   = dataDir + "aesData_config9_Dev_" + str(val) + ".csv"
-		testStr  = dataDir + "aesData_config9_Test_" + str(val) + ".csv"
-
-		## get the data for each sub part
-		x_train_inter, y_train_inter = process_inputs(trainStr)
-		x_dev_inter, y_dev_inter     = process_inputs(devStr)
-		x_test_inter, y_test_inter   = process_inputs(testStr)
-
-		## Substituing chunks of data to the allocated space in the array
-		## The order of placement is 1,0,3,2 for the arrays
-		x_train[trainSize*index*64: trainSize*(index+1)*64, : ] = x_train_inter
-		x_dev[devSize*index*64: devSize*(index+1)*64, : ] = x_dev_inter
-		x_test[testSize*index*64: testSize*(index+1)*64, : ] = x_test_inter
-
-		y_train[trainSize*index*64: trainSize*(index+1)*64, 0] = y_train_inter
-		y_dev[devSize*index*64: devSize*(index+1)*64, 0 ] = y_dev_inter
-		y_test[testSize*index*64: testSize*(index+1)*64, 0 ] = y_test_inter
-		print("Finished data processing for %d set\n" %(val))
+	## Count for saving files
+	count = 0
 	
-	## Clear variables
-	x_train_inter = None
-	x_dev_inter = None
-	x_test_inter = None
-	y_train_inter = None
-	y_dev_inter = None
-	y_test_inter = None
-	print("\nCleared variables\n")
+	## Number of keys to save in one train file
+	partLen = 128
 
-	## One hot assignment
-	n_classes = 256
-	y_train_oh = np_utils.to_categorical(y_train, n_classes)
-	y_dev_oh = np_utils.to_categorical(y_dev, n_classes)
-	y_test_oh = np_utils.to_categorical(y_test, n_classes)
-	
-	print("\nOne-hot encoded for outputs\n")
+	## Create output 
+	inter_y = np.zeros([trainSize,1])
+	inter_y[1999] = 1 ## Settting the 2000th data to be '1', which is the the AES trace
 
-	return (x_train, y_train_oh), (x_dev, y_dev_oh), (x_test, y_test_oh)
+	for key in range(keySize):
+		## Get 3 random samples for adding train, dev and test to the data
+		index = random.sample(range(500), 3)
+
+		## Load each key data for creating the training and testing files
+		matStr = runDir + "/matResult/" +  config + "/value" + str(key) + ".mat"
+
+		## Create intermediate datasets which will be post processed to get data 
+		## split into 1361 power traces
+		interTrain = si.loadmat(matStr)["power"][index[0]]
+		interDev =   si.loadmat(matStr)["power"][index[1]]	
+		interTest =  si.loadmat(matStr)["power"][index[2]]
+
+		## Create data sets, this splits the complete data in 4000 rows with 1361 in each row
+		## Each is a wondow of 1361, with step of 1
+		interTrainData = interTrain[np.array([range(i, i+1361) for i in range(trainSize)])]
+		interDevData =   interDev[np.array([range(i, i+1361) for i in range(trainSize)])]
+		interTestData =  interTest[np.array([range(i, i+1361) for i in range(trainSize)])]
+
+		##Append the output's at 2000th location for correct traces
+		interTrainData = np.concatenate((interTrainData, inter_y), axis=1)
+		interDevData =   np.concatenate((interDevData, inter_y), axis=1)
+		interTestData =  np.concatenate((interTestData, inter_y), axis=1)
+
+		## Append inter*Data to coressponding full data.
+		if key == 0 or key%partLen == 0:
+			fullTrain = interTrainData[:]
+			fullDev = interDevData[:]
+			fullTest = interTestData[:]
+
+		elif key%partLen == 1:
+			fullTrain = np.concatenate((fullTrain, interTrainData), axis=0)
+			fullDev =   np.concatenate((fullDev, interDevData), axis=0)
+			fullTest =  np.concatenate((fullTest, interTestData), axis=0)
+
+			## Save files to csv, so as to use it for portability analysis
+			trainSave = runDir + "/processedData/run_1_per_key/data/" + config + "/train_" + count + ".csv"
+			devSave   = runDir + "/processedData/run_1_per_key/data/" + config + "/dev_" + count + ".csv"
+			testSave  = runDir + "/processedData/run_1_per_key/data/" + config + "/test_" + count + ".csv"
+
+			##Save files
+			np.savetxt(trainSave, fullTrain, fmt="%10.5f", delimiter=",")
+			np.savetxt(devSave, fullTrain, fmt="%10.5f", delimiter=",")
+			np.savetxt(testSave, fullTrain, fmt="%10.5f", delimiter=",")
+
+			## Increment the count variable
+			count = count + 1
+			
+		else:
+			fullTrain = np.concatenate((fullTrain, interTrainData), axis=0)
+			fullDev =   np.concatenate((fullDev, interDevData), axis=0)
+			fullTest =  np.concatenate((fullTest, interTestData), axis=0)
+			
+
+		## Clear variables
+		interTrain = None
+		interDev = None
+		interTest = None
+		interTrainData = None
+		interDevData = None
+		interTestData = None
+
+	##Create final datasets
+	x_train, y_train = process_inputs(fullTrain)
+	x_dev, y_dev = process_inputs(fullDev)
+	x_test, y_test = process_inputs(fullTest)
+
+	##Clear fullData variables
+	fullTrain = None
+	fullDev = None
+	fullTest = None
+
+	print("\nCleared fullData variables\n")
+
+	print("Shapes of datasets\nx_train=%s, y_train=%s\nx_dev=%s, y_dev=%s\nx_test=%s, y_test=%s" 
+	       %(x_train.shape, y_train.shape, x_dev.shape, y_dev.shape, x_test.shape, y_test.shape))
+
+	return (x_train, y_train), (x_dev, y_dev), (x_test, y_test)
 
 class Classifier:
 	def __init__(self, resultDir: str, modelName: str, x_train, y_train_oh, x_dev, y_dev_oh, x_test, y_test_oh, hiddenSize):
@@ -130,10 +154,10 @@ class Classifier:
 		self.model.add(Activation('relu'))                            
 
 		self.model.add(Dropout(self.dropOut))
-		self.model.add(Dense(256))
-		self.model.add(Activation('softmax'))
+		self.model.add(Dense(1))
+		self.model.add(Activation('sigmoid'))
 
-		self.model.compile(loss='categorical_crossentropy', metrics=['categorical_accuracy'], optimizer='adam')
+		self.model.compile(loss='binary_crossentropy', metrics=['binary_accuracy'], optimizer='adam')
 		print("Model summary\n")
 		print(self.model.summary())
 
@@ -147,15 +171,15 @@ class Classifier:
 		logFile = self.resultDir + '/' + self.modelName +'.log'
 		csv_logger = CSVLogger(logFile, append=True, separator="\t")
 		
-		earlyStop = newCallBacks.EarlyStopNew(monitor='val_categorical_accuracy', patience=5, mode='auto', verbose=1)
+		earlyStop = EarlyStopping(monitor='val_categorical_accuracy', patience=5, mode='auto', verbose=1, restore_best_weights=True)
 		
-		filePath = self.resultDir + '/' + self.modelName + '_checkPoint_best_model.hdf5'
-		## This file will include the epoch number when it gets saved.
-		repeatingFile = self.resultDir + '/' + self.modelName +'_{epoch:02d}_epoch_acc_{accVal:.2f}.hdf5'
-		## By default the every_10epochs will save the model at every 10 epochs
-		checkPoint = newCallBacks.ModelCheckpoint_every_10epochs(filePath, repeatingFile, self.x_test, self.y_test_oh , monitor='val_categorical_accuracy', verbose=1, save_best_only=True, every_10epochs=True)
+		#filePath = self.resultDir + '/' + self.modelName + '_checkPoint_best_model.hdf5'
+		### This file will include the epoch number when it gets saved.
+		#repeatingFile = self.resultDir + '/' + self.modelName +'_{epoch:02d}_epoch_acc_{accVal:.2f}.hdf5'
+		### By default the every_10epochs will save the model at every 10 epochs
+		#checkPoint = newCallBacks.ModelCheckpoint_every_10epochs(filePath, repeatingFile, self.x_test, self.y_test_oh , monitor='val_categorical_accuracy', verbose=1, save_best_only=True, every_10epochs=True)
 		
-		self.history = self.model.fit(self.x_train, self.y_train_oh, batch_size= batchSize, epochs=Epochs, verbose=1, shuffle= True, validation_data=(self.x_dev, self.y_dev_oh), callbacks=[csv_logger, checkPoint, earlyStop])
+		self.history = self.model.fit(self.x_train, self.y_train_oh, batch_size= batchSize, epochs=Epochs, verbose=1, shuffle= True, validation_data=(self.x_dev, self.y_dev_oh), callbacks=[csv_logger, earlyStop])
 
 	def evaluate(self):
 		""" Evaluate the model on itself
@@ -168,7 +192,7 @@ class Classifier:
 	def saveModel(self):
 		""" Save the model
 		"""
-		saveStr = self.resultDir + '/' + self.modelName +'_3HLw_500_500_256_noDrop_' + str(self.history.epoch[-1]+1) + 'epochs_' + str(self.dropOut).replace('.', 'p') + 'Dropout_' + '{0:.2f}'.format(self.model_score[1]*100).replace('.', 'p') + '.h5'
+		saveStr = self.resultDir + '/' + self.modelName +'1HL_' + str(self.hiddenSize) + '_' + str(self.history.epoch[-1]+1) + 'epochs_' + str(self.dropOut).replace('.', 'p') + 'Dropout_' + '{0:.2f}'.format(self.model_score[1]*100).replace('.', 'p') + '.h5'
 		print("Saving model to\n%s\n" %(saveStr))
 		self.model.save(saveStr)
 
