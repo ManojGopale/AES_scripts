@@ -133,7 +133,7 @@ def getData(config, trainSize):
 	return (x_train, y_train), (x_dev, y_dev), (x_test, y_test)
 
 class Classifier:
-	def __init__(self, resultDir: str, modelName: str, x_train, y_train_oh, x_dev, y_dev_oh, x_test, y_test_oh, hiddenSize):
+	def __init__(self, resultDir: str, modelName: str, x_train, y_train, x_dev, y_dev, x_test, y_test, hiddenSize):
 		""" Initialize parameters and sequential model for training
 		"""
 		self.resultDir = resultDir
@@ -141,9 +141,9 @@ class Classifier:
 		self.x_train = x_train
 		self.x_dev = x_dev
 		self.x_test = x_test
-		self.y_train_oh = y_train_oh
-		self.y_dev_oh = y_dev_oh
-		self.y_test_oh = y_test_oh
+		self.y_train = y_train
+		self.y_dev = y_dev
+		self.y_test = y_test
 		self.hiddenSize = hiddenSize
 
 		self.dropOut = 0.2
@@ -177,15 +177,27 @@ class Classifier:
 		### This file will include the epoch number when it gets saved.
 		#repeatingFile = self.resultDir + '/' + self.modelName +'_{epoch:02d}_epoch_acc_{accVal:.2f}.hdf5'
 		### By default the every_10epochs will save the model at every 10 epochs
-		#checkPoint = newCallBacks.ModelCheckpoint_every_10epochs(filePath, repeatingFile, self.x_test, self.y_test_oh , monitor='val_categorical_accuracy', verbose=1, save_best_only=True, every_10epochs=True)
+		#checkPoint = newCallBacks.ModelCheckpoint_every_10epochs(filePath, repeatingFile, self.x_test, self.y_test , monitor='val_categorical_accuracy', verbose=1, save_best_only=True, every_10epochs=True)
+
+		##Class weights for class imbalanced data
+		## https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+		y = self.y_train.astype(int)
+
+		sampleSize = len(y)
+		classNum = len(set(y))
+
+		weight_0 = sampleSize/(classNum * np.bincount(y)[0])
+		weight_1 = sampleSize/(classNum * np.bincount(y)[1])
+
+		classWeight = {0: weight_0, 1: weight_1}
 		
-		self.history = self.model.fit(self.x_train, self.y_train_oh, batch_size= batchSize, epochs=Epochs, verbose=1, shuffle= True, validation_data=(self.x_dev, self.y_dev_oh), callbacks=[csv_logger, earlyStop])
+		self.history = self.model.fit(self.x_train, self.y_train, batch_size= batchSize, epochs=Epochs, verbose=1, shuffle= True, validation_data=(self.x_dev, self.y_dev), class_weight=classWeight, callbacks=[csv_logger, earlyStop])
 
 	def evaluate(self):
 		""" Evaluate the model on itself
 		"""
 
-		self.model_score = self.model.evaluate(self.x_test, self.y_test_oh, batch_size=2048)
+		self.model_score = self.model.evaluate(self.x_test, self.y_test, batch_size=2048)
 		print("%s score = %f\n" %(self.modelName, self.model_score[1]))
 		return self.model_score
 	
