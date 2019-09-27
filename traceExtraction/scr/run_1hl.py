@@ -1,4 +1,6 @@
 ## This file will process the matlab data to get back train, dev and test data
+## Then it will train, evaluate and save the model
+
 import sys
 sys.path.insert(0, '/extra/manojgopale/AES_data/traceExtraction/scr/classify_1HL.py')
 import classify_1HL
@@ -8,9 +10,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('-c','--config',
 									action = 'store', type='string', dest='config', default = 'config3p1')
-parser.add_option('-b', '--batchCount',
-									action = 'store', type='int', dest='batchCount', default = 128)
-parser.add_option('-h', '--hiddenSize',
+parser.add_option('--hiddenSize',
 									action = 'store', type='int', dest='hiddenSize', default = 1000)
 parser.add_option('--modelName',
 									action = 'store', type='string', dest='modelName', default = 'defaultName')
@@ -23,7 +23,11 @@ trainDataSize = 4000 ## There are 4000 traces per key
 config = options.config
 modelName = options.modelName
 hiddenSize = options.hiddenSize
+batchSize = 2048
 resultDir = "/xdisk/manojgopale/AES/dataCollection/processedData/run_1_per_key/result/" + config + "/"
+
+print("config=%s\nmodelName=%s\nhiddenSize=%s\nresultDir=%s" 
+			%(config, modelName, hiddenSize, resultDir))
 
 trainData, devData, testData = classify_1HL.getData(config, trainDataSize)
 
@@ -42,5 +46,3 @@ classifier.evaluate()
 
 ##Save the model
 classifier.saveModel()
-
-

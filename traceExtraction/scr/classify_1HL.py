@@ -3,8 +3,6 @@ from keras.models import Sequential, load_model
 from keras.layers.core import Dense, Activation, Dropout
 from keras.utils import np_utils
 from keras.callbacks import CSVLogger, TensorBoard, ModelCheckpoint, EarlyStopping
-## ModelCheckPoint is written in newCallBacks
-from keras.callbacks import CSVLogger, TensorBoard
 import pickle
 import gzip
 import pandas as pd
@@ -31,8 +29,8 @@ scaler = StandardScaler()
 def process_inputs (data):
 	#data = pd.read_csv(dataPath, header=None)
 	dataShuffle = shuffle(data)
-	x_data_shuffle = dataShuffle.iloc[:,0:-1]
-	y_data = dataShuffle.iloc[:,-1]
+	x_data_shuffle = dataShuffle[:,0:-1]
+	y_data = dataShuffle[:,-1]
 	x_data = scaler.fit_transform(x_data_shuffle)
 	return x_data, y_data
 
@@ -48,6 +46,7 @@ def getData(config, trainSize):
 	
 	## Number of keys to save in one train file
 	partLen = 128
+	keySize = 256
 
 	## Create output 
 	inter_y = np.zeros([trainSize,1])
@@ -59,6 +58,7 @@ def getData(config, trainSize):
 
 		## Load each key data for creating the training and testing files
 		matStr = runDir + "/matResult/" +  config + "/value" + str(key) + ".mat"
+		print("key=%s\nmatStr=%s\n" %(key, matStr))
 
 		## Create intermediate datasets which will be post processed to get data 
 		## split into 1361 power traces
@@ -82,16 +82,17 @@ def getData(config, trainSize):
 			fullTrain = interTrainData[:]
 			fullDev = interDevData[:]
 			fullTest = interTestData[:]
+			print("loop1: key=%s" %(key))
 
-		elif key%partLen == 1:
+		elif key%partLen == partLen-1:
 			fullTrain = np.concatenate((fullTrain, interTrainData), axis=0)
 			fullDev =   np.concatenate((fullDev, interDevData), axis=0)
 			fullTest =  np.concatenate((fullTest, interTestData), axis=0)
 
 			## Save files to csv, so as to use it for portability analysis
-			trainSave = runDir + "/processedData/run_1_per_key/data/" + config + "/train_" + count + ".csv"
-			devSave   = runDir + "/processedData/run_1_per_key/data/" + config + "/dev_" + count + ".csv"
-			testSave  = runDir + "/processedData/run_1_per_key/data/" + config + "/test_" + count + ".csv"
+			trainSave = runDir + "/processedData/run_1_per_key/data/" + config + "/train_" + str(count) + ".csv"
+			devSave   = runDir + "/processedData/run_1_per_key/data/" + config + "/dev_" + str(count) + ".csv"
+			testSave  = runDir + "/processedData/run_1_per_key/data/" + config + "/test_" + str(count) + ".csv"
 
 			##Save files
 			np.savetxt(trainSave, fullTrain, fmt="%10.5f", delimiter=",")
@@ -100,11 +101,15 @@ def getData(config, trainSize):
 
 			## Increment the count variable
 			count = count + 1
+
+			print("loop2: key=%s" %(key))
+			print("\nSaved data to\n%s\n%s\n%s" %(trainSave, devSave, testSave))
 			
 		else:
 			fullTrain = np.concatenate((fullTrain, interTrainData), axis=0)
 			fullDev =   np.concatenate((fullDev, interDevData), axis=0)
 			fullTest =  np.concatenate((fullTest, interTestData), axis=0)
+			print("loop3: key=%s" %(key))
 			
 
 		## Clear variables
@@ -171,7 +176,7 @@ class Classifier:
 		logFile = self.resultDir + '/' + self.modelName +'.log'
 		csv_logger = CSVLogger(logFile, append=True, separator="\t")
 		
-		earlyStop = EarlyStopping(monitor='val_categorical_accuracy', patience=5, mode='auto', verbose=1, restore_best_weights=True)
+		earlyStop = EarlyStopping(monitor='val_binary_accuracy', patience=5, mode='auto', verbose=1, restore_best_weights=True)
 		
 		#filePath = self.resultDir + '/' + self.modelName + '_checkPoint_best_model.hdf5'
 		### This file will include the epoch number when it gets saved.
