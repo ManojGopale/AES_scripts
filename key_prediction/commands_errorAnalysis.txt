@@ -1,0 +1,2 @@
+## This will find mis-predicted keys, sort it and show the count
+less config3p1_config5p2.csv | sed  's/,//' | awk '{if($1!=$2) print $1, $2}' | sort | uniq -c | sort -nr | less

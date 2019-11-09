@@ -3,18 +3,18 @@ configList=(config3p1 config3p2 config3p3 config3p4 config4p1 config4p2 config4p
 
 modelConfig=${configList[0]}
 trainSize=15000
-modelDir="/extra/manojgopale/AES_data/config3p1_15ktraining/batchSize_trials/size_2048/"
+modelDir="/extra/manojgopale/AES_data/config3p1_15ktraining/batchSize_trials/size_16384/"
 testDir="/xdisk/manojgopale/data_csv/"
-modelName="model_batchSize_3HLw_500_500_256_noDrop_12epochs_0p2Dropout_98p42.h5"
+modelName="batchSize_trial_3HLw_500_500_256_6epochs_Dropout_0p2_0p2_0p2_100p00.h5"
+testFlag=1
 
-
-for index in {8..8}
+for index in {0..11}
 do
 	jobName=crossAnalysis_"${modelConfig}"_"${configList[${index}]}"
 	echo "$jobName"
 
 	#--- Make sure to remove -o and -e from ~/run_aes_template.sh ---###
-  qsubCmd="qsub -N ${jobName} -o ~/AES_error_output_dir/${jobName}_output.txt -e ~/AES_error_output_dir/${jobName}_error.txt -v modelConfig=${modelConfig},testConfig=${configList[${index}]},trainSize=${trainSize},modelDir=${modelDir},testDir=${testDir},modelName=${modelName} /extra/manojgopale/AES_data/keyPrediction_scripts/run_aes_crossAnalysis_template.sh"
+  qsubCmd="qsub -N ${jobName} -o ${modelDir}/${jobName}_output.txt -e ${modelDir}/${jobName}_error.txt -v modelConfig=${modelConfig},testConfig=${configList[${index}]},trainSize=${trainSize},modelDir=${modelDir},testDir=${testDir},modelName=${modelName},testFlag=${testFlag} /extra/manojgopale/AES_data/keyPrediction_scripts/run_aes_crossAnalysis_template.sh"
 	echo "$qsubCmd"
 	eval "$qsubCmd"
 

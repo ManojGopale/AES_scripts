@@ -27,6 +27,8 @@ parser.add_option('--testDir',
 									action = 'store', type='string', dest='testDir', default = '/xdisk/manojgopale/data_csv/')
 parser.add_option('--modelName',
 									action = 'store', type='string', dest='modelName', default = 'model_batchSize_3HLw_500_500_256_noDrop_10epochs_0p2Dropout_99p52.h5')
+parser.add_option('--testFlag',
+									action = 'store', type='int', dest='testFlag', default = 0)
 
 (options, args) = parser.parse_args()
 
@@ -38,6 +40,7 @@ trainSize = options.trainSize
 modelDir = options.modelDir
 testDir = options.testDir
 modelName = options.modelName
+testFlag = options.testFlag
 
 ########
 
@@ -45,7 +48,7 @@ modelPath = modelDir + "/" + modelName
 model = load_model(modelPath)
 
 testDataPath = testDir + "/" + testConfig + "/"
-_, _, testData = classify_3HL.getData(testDataPath, trainSize)
+_, _, testData = classify_3HL.getData(testDataPath, trainSize, testFlag)
 x_test, y_test_oh = testData
 
 ## Evaluate the performance of model on testData

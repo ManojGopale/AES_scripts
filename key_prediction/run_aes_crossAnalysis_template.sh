@@ -18,7 +18,7 @@
 
 ### Set the queue to submit this job
 #### We can use windfall or standard, use standard if job cannot be submitted
-#PBS -q standard
+#PBS -q windfall
 
 ### Set the number of cores and memory that will be used for this job
 ### select=1 is the node count, ncpus=4 are the cores in each node, 
@@ -34,10 +34,10 @@
 #PBS -l place=free:shared
 
 ### Specify up to maximum of 1600hours totoal cpu time for job
-#PBS -l cput=200:0:0 
+#PBS -l cput=20:0:0 
 
 ### Specify upto a maximum of 240 hours walltime for job
-#PBS -l walltime=10:0:0 
+#PBS -l walltime=5:0:0 
 
 
 cd /home/u3/manojgopale
@@ -45,5 +45,5 @@ cd /home/u3/manojgopale
 module load singularity
 
 date
-/usr/bin/time singularity exec --nv /extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /extra/manojgopale/AES_data/keyPrediction_scripts/crossConfigAnalysis.py -m ${modelConfig} -t ${testConfig} --trainSize ${trainSize} --modelDir ${modelDir} --testDir ${testDir} --modelName ${modelName}
+/usr/bin/time singularity exec --nv /extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /extra/manojgopale/AES_data/keyPrediction_scripts/crossConfigAnalysis.py -m ${modelConfig} -t ${testConfig} --trainSize ${trainSize} --modelDir ${modelDir} --testDir ${testDir} --modelName ${modelName} --testFlag ${testFlag}
 date
