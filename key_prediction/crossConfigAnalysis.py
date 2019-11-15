@@ -27,6 +27,10 @@ parser.add_option('--testDir',
 									action = 'store', type='string', dest='testDir', default = '/xdisk/manojgopale/data_csv/')
 parser.add_option('--modelName',
 									action = 'store', type='string', dest='modelName', default = 'model_batchSize_3HLw_500_500_256_noDrop_10epochs_0p2Dropout_99p52.h5')
+parser.add_option('--trainFlag',
+									action = 'store', type='int', dest='trainFlag', default = 0)
+parser.add_option('--devFlag',
+									action = 'store', type='int', dest='devFlag', default = 0)
 parser.add_option('--testFlag',
 									action = 'store', type='int', dest='testFlag', default = 0)
 
@@ -35,37 +39,62 @@ parser.add_option('--testFlag',
 ########
 
 modelConfig = options.modelConfig
-testConfig = options.testConfig
-trainSize = options.trainSize
-modelDir = options.modelDir
-testDir = options.testDir
-modelName = options.modelName
-testFlag = options.testFlag
+testConfig  = options.testConfig
+trainSize   = options.trainSize
+modelDir 		= options.modelDir
+testDir 		= options.testDir
+modelName 	= options.modelName
+trainFlag 	= options.trainFlag
+devFlag 		= options.devFlag
+testFlag 		= options.testFlag
 
 ########
 
 modelPath = modelDir + "/" + modelName
 model = load_model(modelPath)
 
-testDataPath = testDir + "/" + testConfig + "/"
-_, _, testData = classify_3HL.getData(testDataPath, trainSize, testFlag)
-x_test, y_test_oh = testData
+if (devFlag):
+	devDataPath = testDir + "/" + testConfig + "/"
+	_, devData,_ = classify_3HL.getData(devDataPath, trainSize, trainFlag, devFlag, testFlag)
+	x_dev, y_dev_oh = devData
+	
+	## Evaluate the performance of model on testData
+	model_score = model.evaluate(x_dev, y_dev_oh, batch_size=2048)
+	print("\nmodel= %s score on %s is: %s\n" %(modelConfig, testConfig, model_score[1]))
+	
+	## Convert from one-hot to numerical prediction
+	y_pred = np.argmax(model.predict(x_dev, batch_size=2048), axis=1)
+	
+	## vstack the actual and predicted output and take transpose
+	output_predict = np.vstack((np.argmax(y_dev_oh, axis=1), y_pred)).T
+	
+	## Save it to csv file for future analysis
+	outputFile = modelDir + "/"  + modelConfig + "_" + testConfig + "_dev.csv" 
+	np.savetxt(outputFile, output_predict, fmt="%5.0f", delimiter=",")
+	
+	##Error Analysis
+	errorAnalysis(outputFile)
 
-## Evaluate the performance of model on testData
-model_score = model.evaluate(x_test, y_test_oh, batch_size=2048)
-print("\nmodel= %s score on %s is: %s\n" %(modelConfig, testConfig, model_score[1]))
-
-## Convert from one-hot to numerical prediction
-y_pred = np.argmax(model.predict(x_test, batch_size=2048), axis=1)
-
-## vstack the actual and predicted output and take transpose
-output_predict = np.vstack((np.argmax(y_test_oh, axis=1), y_pred)).T
-
-## Save it to csv file for future analysis
-outputFile = modelDir + "/"  + modelConfig + "_" + testConfig + ".csv" 
-np.savetxt(outputFile, output_predict, fmt="%5.0f", delimiter=",")
-
-##Error Analysis
-errorAnalysis(outputFile)
+elif (testFlag):
+	testDataPath = testDir + "/" + testConfig + "/"
+	_, _, testData = classify_3HL.getData(testDataPath, trainSize, trainFlag, devFlag, testFlag)
+	x_test, y_test_oh = testData
+	
+	## Evaluate the performance of model on testData
+	model_score = model.evaluate(x_test, y_test_oh, batch_size=2048)
+	print("\nmodel= %s score on %s is: %s\n" %(modelConfig, testConfig, model_score[1]))
+	
+	## Convert from one-hot to numerical prediction
+	y_pred = np.argmax(model.predict(x_test, batch_size=2048), axis=1)
+	
+	## vstack the actual and predicted output and take transpose
+	output_predict = np.vstack((np.argmax(y_test_oh, axis=1), y_pred)).T
+	
+	## Save it to csv file for future analysis
+	outputFile = modelDir + "/"  + modelConfig + "_" + testConfig + "_test.csv" 
+	np.savetxt(outputFile, output_predict, fmt="%5.0f", delimiter=",")
+	
+	##Error Analysis
+	errorAnalysis(outputFile)
 
 print("#########--------------###########\n")

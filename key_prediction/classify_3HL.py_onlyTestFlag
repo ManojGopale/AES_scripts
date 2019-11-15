@@ -39,7 +39,7 @@ def process_inputs (dataPath):
 ## dataPath : Path where the working directory is located. 
 ## trainSize : Number of power traces per key to take
 ## testFlag : if true, then traina nd dev data won't be loaded
-def getData(dataPath, trainSize, trainFlag, devFlag, testFlag):
+def getData(dataPath, trainSize, testFlag):
 	#runDir = "/extra/manojgopale/AES_data/config3p3_15ktraining/"
 	runDir = dataPath
 	dataDir = runDir + "/data/"
@@ -64,42 +64,30 @@ def getData(dataPath, trainSize, trainFlag, devFlag, testFlag):
 		## Checking if the file size is 0, before processing data
 		## This check is for cross config analysis, where traina nd dev are empty
 		#if (os.stat(trainStr).st_size != 0):
-		if (trainFlag):
+		if (not testFlag):
 			x_train_inter, y_train_inter = process_inputs(trainStr)
 			## Substituing chunks of data to the allocated space in the array
 			## The order of placement is 1,0,3,2 for the arrays
 			x_train[trainSize*index*64: trainSize*(index+1)*64, : ] = x_train_inter
 			y_train[trainSize*index*64: trainSize*(index+1)*64, 0] = y_train_inter
-			print("Train= %s\n" %(trainFlag))
 		else: 
-			## Assigning the array's to 0's
 			x_train[trainSize*index*64: trainSize*(index+1)*64, : ] = np.zeros((trainSize*64,1361))
 			y_train[trainSize*index*64: trainSize*(index+1)*64, : ] = np.zeros((trainSize*64, 1))
-			print("train= %s\n" %(trainFlag))
 
 		#if (os.stat(devStr).st_size != 0):
-		if (devFlag):
+		if (not testFlag):
 		## get the data for each sub part
 			x_dev_inter, y_dev_inter     = process_inputs(devStr)
 			x_dev[devSize*index*64: devSize*(index+1)*64, : ] = x_dev_inter
 			y_dev[devSize*index*64: devSize*(index+1)*64, 0 ] = y_dev_inter
-			print("Dev= %s\n" %(devFlag))
 		else:
 			x_dev[devSize*index*64: devSize*(index+1)*64, : ] = np.zeros((devSize*64, 1361))
 			y_dev[devSize*index*64: devSize*(index+1)*64, : ] = np.zeros((devSize*64, 1))
-			print("dev= %s\n" %(devFlag))
 
 		## Test data is present so check is not performed
-		if (testFlag):
-			x_test_inter, y_test_inter   = process_inputs(testStr)
-			x_test[testSize*index*64: testSize*(index+1)*64, : ] = x_test_inter
-			y_test[testSize*index*64: testSize*(index+1)*64, 0 ] = y_test_inter
-			print("Test= %s\n" %(testFlag))
-		else:
-			x_test[testSize*index*64: testSize*(index+1)*64, : ] = np.zeros((testSize*64, 1361))
-			y_test[testSize*index*64: testSize*(index+1)*64, : ] = np.zeros((testSize*64, 1))
-			print("test= %s\n" %(testFlag))
-
+		x_test_inter, y_test_inter   = process_inputs(testStr)
+		x_test[testSize*index*64: testSize*(index+1)*64, : ] = x_test_inter
+		y_test[testSize*index*64: testSize*(index+1)*64, 0 ] = y_test_inter
 		print("Finished data processing for %d set\n" %(val))
 	
 	## Clear variables
@@ -179,19 +167,15 @@ class Classifier:
 		""" Evaluate the model on itself
 		"""
 
-		## We should be evaluating on dev dataset as well, so commenting x_test
-		#self.model_score = self.model.evaluate(self.x_test, self.y_test_oh, batch_size=2048)
-		self.model_score = self.model.evaluate(self.x_dev, self.y_dev_oh, batch_size=2048)
+		self.model_score = self.model.evaluate(self.x_test, self.y_test_oh, batch_size=2048)
 		print("%s score = %f\n" %(self.modelName, self.model_score[1]))
 
 		##Saving atucal vs predicted predictions
 		##np.argmax returns the index where it see's 1 in the row
-		#y_pred = np.argmax(self.model.predict(self.x_test, batch_size=2048), axis=1)
-		y_pred = np.argmax(self.model.predict(self.x_dev, batch_size=2048), axis=1)
+		y_pred = np.argmax(self.model.predict(self.x_test, batch_size=2048), axis=1)
 
 		## vstack will stack them in 2 rows, so we use Trasnpose to get them in column stack
-		#output_predict = np.vstack((np.argmax(self.y_test_oh, axis=1), y_pred)).T
-		output_predict = np.vstack((np.argmax(self.y_dev_oh, axis=1), y_pred)).T
+		output_predict = np.vstack((np.argmax(self.y_test_oh, axis=1), y_pred)).T
 		outputFile = self.resultDir + "/outputPredict.csv"  
 		np.savetxt(outputFile, output_predict, fmt="%5.0f", delimiter=",")
 
@@ -199,7 +183,7 @@ class Classifier:
 		errorAnalysis(outputFile)
 
 		return self.model_score
-
+	
 	def saveModel(self):
 		""" Save the model
 		"""
