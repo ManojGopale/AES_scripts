@@ -35,10 +35,10 @@
 #PBS -l place=free:shared
 
 ### Specify up to maximum of 1600hours totoal cpu time for job
-#PBS -l cput=500:0:0 
+#PBS -l cput=1000:0:0 
 
 ### Specify upto a maximum of 240 hours walltime for job
-#PBS -l walltime=50:0:0 
+#PBS -l walltime=150:0:0 
 
 
 cd /home/u3/manojgopale
@@ -46,5 +46,5 @@ cd /home/u3/manojgopale
 module load singularity
 
 date
-/usr/bin/time singularity exec --nv /xdisk/bethard/mig2020/extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /xdisk/rlysecky/manojgopale/extra/keyPrediction_chip/scr/moreDataTrials/scr/run_general_template.py --modelName ${modelName}  --testFlag 1 --trainSize 28000 --numPowerTraces ${numPowerTraces}
+/usr/bin/time singularity exec --nv /xdisk/bethard/mig2020/extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /xdisk/rlysecky/manojgopale/extra/keyPrediction_chip/scr/moreDataTrials/scr/rerun_general_minMaxNorm_template.py --modelName ${modelName}  --testFlag 1 --trainSize 28000 --numPowerTraces ${numPowerTraces}
 date

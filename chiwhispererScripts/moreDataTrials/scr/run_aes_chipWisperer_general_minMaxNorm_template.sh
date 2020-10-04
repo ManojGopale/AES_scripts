@@ -46,5 +46,5 @@ cd /home/u3/manojgopale
 module load singularity
 
 date
-/usr/bin/time singularity exec --nv /xdisk/bethard/mig2020/extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /xdisk/rlysecky/manojgopale/extra/keyPrediction_chip/scr/moreDataTrials/scr/run_general_template.py --modelName ${modelName}  --testFlag 1 --trainSize 28000 --numPowerTraces ${numPowerTraces}
+/usr/bin/time singularity exec --nv /xdisk/bethard/mig2020/extra/manojgopale/AES_data/dockerImage/ocelote_keras-2.2.4+tensorflow-1.13.1_gpu-cp35-cuda10.0-cudnn7.5.sif python3.5 /xdisk/rlysecky/manojgopale/extra/keyPrediction_chip/scr/moreDataTrials/scr/run_general_minMaxNorm_template.py --modelName ${modelName}  --testFlag 1 --trainSize 28000 --numPowerTraces ${numPowerTraces}
 date

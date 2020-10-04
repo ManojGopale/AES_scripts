@@ -49,7 +49,7 @@ def process_inputs (dataPath):
 ## dataPath : Path where the working directory is located. 
 ## trainSize : Number of power traces per key to take
 ## testFlag : if true, then traina nd dev data won't be loaded
-def getData(dataPath, moreDataPath, trainSize, trainFlag, devFlag, testFlag):
+def getData(dataPath, moreDataPath, trainSize, trainFlag, devFlag, testFlag, scale):
 	##TODO changed devSize to 1000 for trails for more trainSize data. It was 5000 for default run
 	devSize  = 1000
 	testSize = 1000
@@ -160,14 +160,14 @@ def getData(dataPath, moreDataPath, trainSize, trainFlag, devFlag, testFlag):
 	
 	print("\nOne-hot encoded for outputs\n")
 	## Standardizing train, dev and test
-	x_train_mean = x_train.mean(axis=0)
-	x_train_std  = x_train.std(axis=0)
+	x_train_max = x_train.max(axis=0)
+	x_train_min  = x_train.min(axis=0)
 
-	x_dev_mean = x_dev.mean(axis=0)
-	x_dev_std = x_dev.mean(axis=0)
+	x_dev_max = x_dev.max(axis=0)
+	x_dev_min = x_dev.min(axis=0)
 
-	x_test_mean = x_test.mean(axis=0)
-	x_test_std = x_test.std(axis=0)
+	x_test_max = x_test.max(axis=0)
+	x_test_min = x_test.min(axis=0)
 
 	#M## Concatenating train and dev
 	#Mx_full = np.concatenate((x_train, x_dev), axis=0)
@@ -181,18 +181,18 @@ def getData(dataPath, moreDataPath, trainSize, trainFlag, devFlag, testFlag):
 	for chunkIndex in range(chunkNum):
 		print("Train chunkIndx= %s, chunkNum = %s" %(chunkIndex, chunkNum))
 		if(chunkIndex != chunkNum-1): 
-			x_train[chunkIndex*chunkSize: (chunkIndex+1)*chunkSize] = (x_train[chunkIndex*chunkSize: (chunkIndex+1)*chunkSize]-x_train_mean)/x_train_std
+			x_train[chunkIndex*chunkSize: (chunkIndex+1)*chunkSize] = scale * (x_train[chunkIndex*chunkSize: (chunkIndex+1)*chunkSize]-x_train_min)/(x_train_max-x_train_min)
 		else:
-			x_train[chunkIndex*chunkSize: ] = (x_train[chunkIndex*chunkSize: ] - x_train_mean)/x_train_std
+			x_train[chunkIndex*chunkSize: ] = scale * (x_train[chunkIndex*chunkSize: ] - x_train_min)/(x_train_max-x_train_min)
 			
 	devChunkSize = 10000
 	devChunkNum = int(len(x_dev)/devChunkSize)
 	for devChunkIndex in range(devChunkNum):
 		print("Dev chunkIndx= %s, chunkNum = %s" %(devChunkIndex, devChunkNum))
 		if(devChunkIndex != devChunkNum-1): 
-			x_dev[devChunkIndex*devChunkSize: (devChunkIndex+1)*devChunkSize] = (x_dev[devChunkIndex*devChunkSize: (devChunkIndex+1)*devChunkSize]-x_train_mean)/x_train_std
+			x_dev[devChunkIndex*devChunkSize: (devChunkIndex+1)*devChunkSize] = scale * (x_dev[devChunkIndex*devChunkSize: (devChunkIndex+1)*devChunkSize]-x_train_min)/(x_train_max-x_train_min)
 		else:
-			x_dev[devChunkIndex*devChunkSize: ] = (x_dev[devChunkIndex*devChunkSize: ] - x_train_mean)/x_train_std
+			x_dev[devChunkIndex*devChunkSize: ] = scale * (x_dev[devChunkIndex*devChunkSize: ] - x_train_min)/(x_train_max-x_train_min)
 			
 
 	## Need to do the same for test too

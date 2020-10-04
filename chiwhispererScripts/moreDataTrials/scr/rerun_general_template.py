@@ -46,29 +46,12 @@ x_test, y_test_oh = testData
 ##modelName = "m_newscript"
 np.random.seed()
 
-numAllHiddenLayers = [3,4,5,6,7,8,9,10]
-hiddenLayerDict = {"num": [1,2,3,4,5,6,7,8,9,10], "factor": [10, 100, 1000]}
-allAct = ['relu', 'tanh', 'elu']
-allDrop = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
-batchNormBin = [0, 1] ##Disabled batch norm to check if the runs go through
-## Lower batizes did not yield good results, starting from 2^10
-#batchSizePowers = [5,6,7,8,9,10,11,12,13,14,15,16]
-#batchSizePowers = [10,11,12,13,14,15,16] ##Till run170
-batchSizePowers = [10,11,12,13]
-
-## number of samples is not required, since default is none, 
-## and also will return an array if samples is provided, which wont work while indexing
-numHiddenLayers = numAllHiddenLayers[np.random.random_integers(0, len(numAllHiddenLayers)-1)]
-actList = [allAct[i] for i in np.random.random_integers(0, len(allAct)-1, numHiddenLayers).tolist()]
-dropList = [allDrop[i] for i in np.random.random_integers(0, len(allDrop)-1, numHiddenLayers).tolist()]
-batchNorm = [batchNormBin[i] for i in np.random.random_integers(0, len(batchNormBin)-1, numHiddenLayers).tolist()]
-batchSize = np.power(2, batchSizePowers[np.random.random_integers(0, len(batchSizePowers)-1)])
-
-#hiddenLayer = np.array([hiddenLayerDict["num"][i] for i in np.random.random_integers(0, len(hiddenLayerDict["num"])-1, numHiddenLayers).tolist()]) * np.array([hiddenLayerDict["factor"][i] for i in np.random.random_integers(0, len(hiddenLayerDict["factor"])-1, numHiddenLayers).tolist()])
-## Get random integers between 100, 1500 , those seems to be giving better results
-##hiddenLayer = np.random.randint(100, 2500, numHiddenLayers) ##Till run ~50-60 ->130
-#hiddenLayer = np.random.randint(1000, 4000, numHiddenLayers) ##Runs 130-170
-hiddenLayer = np.random.randint(1000, 10000, numHiddenLayers) ##Runs 130-170
+numHiddenLayers = 6
+actList = ['relu', 'elu', 'elu', 'tanh', 'relu', 'elu']
+dropList = [0.4, 0.3, 0.2, 0.3, 0.5, 0.4]
+batchNorm = [0, 1, 1, 1, 1, 1]
+batchSize = 12288
+hiddenLayer = [2304, 3352, 1940, 1738, 1226]
 
 runLogsPath = "/xdisk/rlysecky/manojgopale/extra/keyPrediction_chip/scr/moreDataTrials/scr/allRuns.csv"
 with open(runLogsPath, 'a') as f:
@@ -76,6 +59,8 @@ with open(runLogsPath, 'a') as f:
 	f.write("\n%s, %s, %s, %s, %s, %s, %s\n" %(modelName, numHiddenLayers, hiddenLayer, actList, dropList, batchNorm, batchSize))
 
 t0_time = time.time()
+#classifier = classify_general.Classifier(resultDir, modelName, x_train, y_train_oh, x_dev, y_dev_oh, x_test, y_test_oh, hiddenLayer, actList, dropList, batchNorm)
+## Taking 1361 power traces only
 classifier = classify_general.Classifier(resultDir, modelName, x_train, y_train_oh, x_dev, y_dev_oh, x_test, y_test_oh, hiddenLayer, actList, dropList, batchNorm, numPowerTraces)
 t1_time = time.time()
 print("\nTime to load the dataset in python for training is %s seconds\n" %(t1_time-t0_time))
