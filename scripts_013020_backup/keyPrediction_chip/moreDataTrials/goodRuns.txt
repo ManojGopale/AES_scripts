@@ -1,0 +1,139 @@
+[manojgopale@login2 scr]$ less ../log/run_74_3HL_118epochs_40p48_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 17 (28.8% acc), maxPredKey= 18 (32.0% acc)---
+key= 38 (25.3% acc), maxPredKey= 37 (26.6% acc)---
+key= 121 (9.6% acc), maxPredKey= 120 (18.7% acc)---
+key= 149 (18.3% acc), maxPredKey= 150 (22.6% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_72_9HL_177epochs_43p61_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 145 (28.1% acc), maxPredKey= 146 (30.1% acc)---
+key= 162 (11.0% acc), maxPredKey= 163 (14.7% acc)---
+key= 197 (15.9% acc), maxPredKey= 203 (20.9% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_73_10HL_203epochs_44p20_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 107 (14.2% acc), maxPredKey= 110 (14.3% acc)---
+key= 139 (13.8% acc), maxPredKey= 141 (22.5% acc)---
+key= 149 (20.6% acc), maxPredKey= 150 (26.5% acc)---
+key= 162 (9.9% acc), maxPredKey= 163 (13.8% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_63_9HL_106epochs_45p13_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 78 (20.6% acc), maxPredKey= 76 (22.3% acc)---
+key= 145 (27.3% acc), maxPredKey= 146 (27.6% acc)---
+key= 149 (14.7% acc), maxPredKey= 150 (21.2% acc)---
+key= 197 (18.5% acc), maxPredKey= 203 (26.3% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_65_9HL_133epochs_41p23_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 29 (25.3% acc), maxPredKey= 30 (25.4% acc)---
+key= 139 (15.9% acc), maxPredKey= 141 (21.7% acc)---
+key= 158 (12.1% acc), maxPredKey= 160 (14.3% acc)---
+
+[manojgopale@login2 scr]$ less ../log/rerun_54_4HL_143epochs_43p48_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 139 (15.7% acc), maxPredKey= 141 (21.1% acc)---
+key= 149 (20.8% acc), maxPredKey= 150 (22.9% acc)---
+key= 162 (11.6% acc), maxPredKey= 163 (15.2% acc)---
+
+[manojgopale@login2 scr]$ less ../log/rerun_49_9HL_105epochs_40p91_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 101 (13.3% acc), maxPredKey= 105 (15.1% acc)---
+key= 121 (13.5% acc), maxPredKey= 120 (14.4% acc)---
+key= 145 (23.7% acc), maxPredKey= 146 (31.7% acc)---
+key= 162 (13.6% acc), maxPredKey= 163 (16.6% acc)---
+
+****
+[manojgopale@login2 scr]$ less ../log/run_83_5HL_126epochs_42p74_acc_keyAccuracy.log | egrep "\-\-\-" 
+key= 107 (14.9% acc), maxPredKey= 110 (15.5% acc)---
+key= 121 (12.5% acc), maxPredKey= 120 (13.3% acc)---
+****
+
+[manojgopale@login2 scr]$ less ../log/run_89_4HL_99epochs_43p35_acc_keyAccuracy.log | egrep "\-\-\-" 
+key= 73 (21.8% acc), maxPredKey= 74 (25.8% acc)---
+key= 121 (14.4% acc), maxPredKey= 120 (14.7% acc)---
+key= 153 (13.5% acc), maxPredKey= 221 (17.9% acc)---
+key= 197 (15.8% acc), maxPredKey= 203 (22.3% acc)---
+
+****
+[manojgopale@login2 scr]$ less ../log/run_92_3HL_196epochs_50p59_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 121 (13.0% acc), maxPredKey= 120 (13.2% acc)---
+key= 248 (13.0% acc), maxPredKey= 177 (14.7% acc)---
+****
+
+[manojgopale@login2 scr]$ less ../log/run_97_3HL_178epochs_47p10_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 29 (22.0% acc), maxPredKey= 30 (25.7% acc)---
+key= 89 (15.4% acc), maxPredKey= 88 (20.8% acc)---
+key= 121 (9.5% acc), maxPredKey= 120 (16.8% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_95_8HL_208epochs_45p20_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 139 (19.9% acc), maxPredKey= 141 (21.3% acc)---
+key= 149 (20.2% acc), maxPredKey= 150 (22.3% acc)---
+key= 197 (12.2% acc), maxPredKey= 203 (24.1% acc)---
+
+****
+[manojgopale@login3 scr]$ less ../log/run_116_6HL_176epochs_44p27_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 139 (19.8% acc), maxPredKey= 141 (20.0% acc)---
+key= 149 (25.1% acc), maxPredKey= 150 (25.5% acc)---
+****
+
+****
+## 0.1, 0.1, 0.5 dropOut
+manojgopale@login3 scr]$ less ../log/fineTune_92_1_3HL_272epochs_52p71_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 121 (13.5% acc), maxPredKey= 120 (15.5% acc)---
+
+## 0.2, 0.2, 0.5 dropOut
+[manojgopale@login2 scr]$ less ../log/fineTune_92_2_3HL_214epochs_50p19_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 107 (16.7% acc), maxPredKey= 110 (17.1% acc)---
+****
+
+[manojgopale@login2 scr]$ less ../log/run_125_3HL_72epochs_38p80_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 139 (14.1% acc), maxPredKey= 141 (19.5% acc)---
+key= 145 (25.1% acc), maxPredKey= 146 (26.9% acc)---
+key= 162 (10.3% acc), maxPredKey= 163 (12.8% acc)---
+
+****
+[manojgopale@login2 scr]$ less ../log/run_128_3HL_176epochs_49p83_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 145 (29.4% acc), maxPredKey= 146 (30.5% acc)---
+****
+
+[manojgopale@login2 scr]$ less ../log/run_144_6HL_140epochs_42p65_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 149 (19.5% acc), maxPredKey= 148 (21.0% acc)---
+key= 162 (10.8% acc), maxPredKey= 161 (11.5% acc)---
+key= 197 (16.3% acc), maxPredKey= 203 (17.3% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_145_4HL_182epochs_47p14_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 139 (7.1% acc), maxPredKey= 141 (29.9% acc)---
+key= 162 (9.6% acc), maxPredKey= 163 (11.8% acc)---
+key= 197 (16.4% acc), maxPredKey= 203 (23.5% acc)---
+
+[manojgopale@login2 scr]$ less ../log/run_143_3HL_199epochs_45p38_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 121 (11.3% acc), maxPredKey= 120 (16.2% acc)---
+key= 197 (18.8% acc), maxPredKey= 203 (20.0% acc)---
+
+[manojgopale@login3 scr]$ less ../log/run_168_6HL_191epochs_45p96_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 162 (13.6% acc), maxPredKey= 163 (13.9% acc)---
+
+[manojgopale@login3 scr]$ less ../log/run_170_8HL_385epochs_49p59_acc_keyAccuracy.log | egrep "\-\-\-"
+key= 197 (19.6% acc), maxPredKey= 180 (19.9% acc)---
+
+###### No violating keys #######
+[manojgopale@login3 scr]$ less ../log/run_115_7HL_244epochs_46p58_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_117_3HL_296epochs_46p81_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/fineTune_83_1_5HL_200epochs_46p31_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login2 scr]$ less ../log/run_129_6HL_233epochs_51p95_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_136_4HL_235epochs_51p91_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_142_8HL_334epochs_54p51_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_146_6HL_423epochs_52p51_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_161_4HL_182epochs_50p69_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_153_4HL_238epochs_52p50_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/run_162_3HL_275epochs_49p06_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/rerun_177_4HL_195epochs_57p54_acc_keyAccuracy.log | egrep "\-\-\-"
+
+[manojgopale@login3 scr]$ less ../log/rerun_177_1_4HL_176epochs_57p44_acc_keyAccuracy.log | egrep "\-\-\-"
+
+################################
