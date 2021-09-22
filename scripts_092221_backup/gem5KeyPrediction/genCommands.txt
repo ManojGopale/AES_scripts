@@ -1,0 +1,2 @@
+### find mtahcing files, prune unwanted files and then paste them
+find ../result/config*/ -type f -name "*modelOf_config3p4*.tsv" ! -name "*config5p2*" ! -name "*config5p3*" ! -name "*paste*" -print0 | xargs -0 paste -d "," > ../result/config3p4/paste_all_modelOf_config3p4.csv

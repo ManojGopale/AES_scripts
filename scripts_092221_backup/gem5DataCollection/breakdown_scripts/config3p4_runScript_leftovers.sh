@@ -1,0 +1,30 @@
+sbatch --job-name config3p4_gem5_to_mat_leftovers_111_120_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_111_120_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_111_120_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_111_120.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_250_255_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_250_255_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_250_255_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_250_255.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_164_165_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_164_165_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_164_165_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_164_165.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_223_225_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_223_225_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_223_225_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_223_225.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_14_15_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_14_15_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_14_15_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_14_15.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_208_210_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_208_210_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_208_210_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_208_210.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_239_240_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_239_240_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_239_240_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_239_240.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_193_195_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_193_195_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_193_195_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_193_195.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_179_180_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_179_180_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_179_180_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_179_180.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_149_150_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_149_150_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_149_150_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_149_150.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_60_60_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_60_60_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_60_60_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_60_60.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_30_30_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_30_30_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_30_30_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_30_30.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_75_75_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_75_75_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_75_75_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_75_75.sh
+
+sbatch --job-name config3p4_gem5_to_mat_leftovers_135_135_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_135_135_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_135_135_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_puma_3p4_leftovers_135_135.sh
+
+#### Since 135 was pending for long time, i shifted the key generation to ocelote
+qsub -N config3p4_gem5_to_mat_leftovers_ocelote_135_135_031821 -o ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_ocelote_135_135_031821_output.txt -e ~/GEM5_Analysis/config3p4_gem5_to_mat_leftovers_ocelote_135_135_031821_error.txt /xdisk/rlysecky/manojgopale/extra/gem5DataCollection/scr/breakdown_scripts/matlab_ocelote_3p4_leftovers_135_135.sh

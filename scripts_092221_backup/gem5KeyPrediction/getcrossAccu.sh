@@ -1,0 +1,28 @@
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config3p1 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config3p2 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config3p3 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config3p4 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config4p1 model of" | sort | awk '{print $10*100}'
+## Do from here
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config4p2 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config4p3 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config4p4 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config5p1 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config5p2 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config5p3 model of" | sort | awk '{print $10*100}'
+less ../result/config*/interArchPortability_Tr7500_onconfig*_testSize500_output.txt | egrep "config5p4 model of" | sort | awk '{print $10*100}'
+
+
+######
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S1 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S2 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S3 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S4 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S5 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S6 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S7 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S8 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S9 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S10 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S11 model of" | sort  | awk '{print $10*100}'
+less  ../result/config*/interArchPortability_dataEnsemble_onconfig*_testSize500_output.txt | egrep "dataEnsemble_S12 model of" | sort  | awk '{print $10*100}'

@@ -1,0 +1,292 @@
+import pandas as pd
+import numpy as np
+from keras.models import load_model
+from sklearn.metrics import confusion_matrix
+from collections import OrderedDict
+import tensorflow as tf
+import time
+import os
+import keras
+import matplotlib.pyplot as plt
+
+import sys
+sys.path.insert(0, '/xdisk/rlysecky/manojgopale/extra/gem5KeyPrediction/scr/')
+import newLoadData
+import gc
+import classify_general
+from error_analysis import errorAnalysis
+
+from optparse import OptionParser
+
+parser = OptionParser()
+
+parser.add_option('--modelDir',
+									action = 'store', type='string', dest='modelDir', default = '/xdisk/rlysecky/manojgopale/extra/gem5KeyPrediction/result/')
+parser.add_option('--testDataDir',
+									action = 'store', type='string', dest='testDataDir', default = '/xdisk/rlysecky/manojgopale/xdisk/gem5DataCollection/csvResult/')
+parser.add_option('-t','--testDataConfig',
+									action = 'store', type='string', dest='testDataConfig', default = 'config3p1')
+parser.add_option('--trainSize',
+									action = 'store', type='int', dest='trainSize', default = 28000)
+parser.add_option('--testSize',
+									action = 'store', type='int', dest='testSize', default = 1000)
+parser.add_option('--trainFlag',
+									action = 'store', type='int', dest='trainFlag', default = 1)
+parser.add_option('--devFlag',
+									action = 'store', type='int', dest='devFlag', default = 1)
+parser.add_option('--testFlag',
+									action = 'store', type='int', dest='testFlag', default = 0)
+parser.add_option('--inputTraces',
+									action = 'store', type='int', dest='inputTraces', default = 1500)
+parser.add_option('--typeOfStd',
+									action = 'store', type='string', dest='typeOfStd', default = 'col')
+
+(options, args) = parser.parse_args()
+
+########
+
+testDataConfig  = options.testDataConfig
+trainSize      = options.trainSize
+testSize        = options.testSize
+modelDir 		   = options.modelDir
+testDataDir 	   = options.testDataDir
+trainFlag 	   = options.trainFlag
+devFlag 		   = options.devFlag
+testFlag 		   = options.testFlag
+inputTraces    = options.inputTraces ##input length for the model
+typeOfStd      = options.typeOfStd ##type of standardization to use, some diff in the way we standardize
+
+########
+
+### TODO:
+### 1. Dev data for 1 or 2 configs will be loaded
+### 2. Models of 5p3_15000TrainSize run's will be loaded to see the accuracy on them
+### 3. Once we get a good set on the test data, we can try it on other configs as well
+
+## NOTE: CHECK THE CORRECT PATHS FOR MEAN AND STD DEV
+if (typeOfStd == "col"):
+	## Load meand and std test 
+	## Added this to classify_general file
+	meanPath = "/xdisk/rlysecky/manojgopale/extra/gem5KeyPrediction/result/allConfigs/config3p1_3p2_3p3_3p4_4p1_4p2_4p3_4p4_5p1_5p2_5p3_5p4_mean.csv"
+	stdPath = "/xdisk/rlysecky/manojgopale/extra/gem5KeyPrediction/result/allConfigs/config3p1_3p2_3p3_3p4_4p1_4p2_4p3_4p4_5p1_5p2_5p3_5p4_std.csv"
+	## Converting them to numpy array for standardisation
+	mean_pool = pd.read_csv(meanPath, header=None).to_numpy()
+	std_pool = pd.read_csv(stdPath, header=None).to_numpy()
+	print("Loaded mean and std files from\n%s\n%s\n" %(meanPath, stdPath))
+	## Reshaping so that it matches the standardization function and not error out
+	mean_pool = mean_pool.reshape(mean_pool.shape[0], )
+	std_pool = std_pool.reshape(std_pool.shape[0], )
+	
+
+#MtestDir = testDataDir + testDataConfig + "/"
+testDir = testDataDir + "/"
+data=newLoadData.Data()
+## NOTE:
+## With new method of standardization directly loading mean and ,stdDev, we do not need to import train dataset now
+if (typeOfStd == "selfNorm"):
+	x_train, y_train = data.getData(testDir, testDataConfig, trainSize, "Train")
+	x_train, y_train = data.shuffleData(x_train, y_train)
+	y_train_oh = data.oneHotY(y_train)
+	x_train_mean, x_train_std = data.getStdParam(x_train)
+	mean_pool, std_pool = data.getStdParam(x_train) ## Comment after 1361 run is over
+	mean_pool = mean_pool.to_numpy()
+	mean_pool = mean_pool.reshape(mean_pool.shape[0], )
+	std_pool = std_pool.to_numpy()
+	std_pool = std_pool.reshape(mean_pool.shape[0], )
+	## Comment till here from NOTE after 1361 runs are done
+
+## Write the mean and std to csv for future use
+#MmeanPath = testDir + "/" + testDataConfig + "/" + modelName + "_mean.csv"
+#MstdPath = testDir + "/" + testDataConfig + "/" + modelName + "_std.csv"
+#Mx_train_mean.to_csv(meanPath, index=False, header=False)
+#Mx_train_std.to_csv(stdPath, index=False, header=False)
+#Mx_train = data.stdData(x_train, x_train_mean, x_train_std)
+##Mgc.collect()
+##Mprint("\nGarbage collected after train\n")
+
+x_test, y_test = data.getData(testDir, testDataConfig, testSize, "Test")
+x_test, y_test = data.shuffleData(x_test, y_test)
+y_test_oh = data.oneHotY(y_test)
+#Mx_test = data.stdData(x_test, x_train_mean, x_train_std)[:,:inputTraces]
+plt_x = np.linspace(0,inputTraces-1, num=inputTraces)
+for index in range(5):
+	plt.plot(plt_x, x_test.iloc[index,:inputTraces], 'r')
+	figName = modelDir + "/" + testDataConfig + "/images_debug/hyper_test_" + str(time.strftime("%Y%m%d-%H%M%S")) + "_preStd_key" + str(y_test.iloc[index].values[0]) + ".png"
+	plt.savefig(figName)
+	plt.close()
+
+if(typeOfStd == "selfNorm"):
+	x_test = data.stdData(x_test.to_numpy(), mean_pool, std_pool)
+elif (typeOfStd=="col"):
+	x_test = data.stdData(x_test.to_numpy(), mean_pool, std_pool)
+	##NOTE: Clipping used only for poolAll datasets
+	print("\nInside col std.\n")
+	x_test = np.where(x_test>10, 10, x_test)
+	x_test = np.where(x_test<-10, -10, x_test)
+elif (typeOfStd=="row"):
+	x_test = data.stdDataRowWise(x_test.to_numpy())
+
+for index in range(5):
+	plt.plot(plt_x, x_test[index,:inputTraces], 'g')
+	figName = modelDir + "/" + testDataConfig + "/images_debug/hyper_test_" + str(time.strftime("%Y%m%d-%H%M%S")) + "_postStd_key" + str(y_test.iloc[index].values[0]) + ".png"
+	plt.savefig(figName)
+	plt.close()
+
+gc.collect()
+print("\nGarbage collected after test\n")
+
+##M_, testData, _ = classify_general.getData(testDataDir, testDataConfig, trainSize, trainFlag, testFlag, testFlag)
+##Mx_test, y_test_oh = testData
+
+modelDict = OrderedDict()
+#MmodelDict = {\
+#M"config3p1": "rerun_dataEns49_43_config_tr7500_3p1_3HL_6epochs_100p00_acc_.h5",\
+#M"config3p2": "rerun_dataEns49_43_config_tr7500_3p2_3HL_7epochs_100p00_acc_.h5",\
+#M"config3p3": "rerun_dataEns49_43_config_tr7500_3p3_3HL_6epochs_100p00_acc_.h5",\
+#M"config3p4": "rerun_dataEns49_43_config_tr7500_3p4_3HL_9epochs_100p00_acc_.h5",\
+#M"config4p1": "rerun_dataEns49_43_config_tr7500_4p1_3HL_6epochs_100p00_acc_.h5",\
+#M"config4p2": "rerun_dataEns49_43_config_tr7500_4p2_3HL_6epochs_99p99_acc_.h5",\
+#M"config4p3": "rerun_dataEns49_43_config_tr7500_4p3_3HL_8epochs_100p00_acc_.h5",\
+#M"config4p4": "rerun_dataEns49_43_config_tr7500_4p4_3HL_6epochs_100p00_acc_.h5",\
+#M"config5p1": "rerun_dataEns49_43_config_tr7500_5p1_3HL_7epochs_100p00_acc_.h5",\
+#M"config5p2": "rerun_dataEns49_43_config_tr7500_5p2_3HL_6epochs_100p00_acc_.h5",\
+#M"config5p3": "rerun_dataEns49_43_config_tr7500_5p3_3HL_6epochs_100p00_acc_.h5",\
+#M"config5p4": "rerun_dataEns49_43_config_tr7500_5p4_3HL_6epochs_100p00_acc_.h5"\
+#M}
+
+modelDict = {\
+"dataEnsemble_S1": "rerun49_43_S1_3750_3HL_9epochs_100p00_acc_.h5",\
+"dataEnsemble_S2": "rerun49_43_S2_3750_3HL_7epochs_99p33_acc_.h5",\
+"dataEnsemble_S3": "rerun49_43_S3_3750_3HL_10epochs_100p00_acc_.h5",\
+"dataEnsemble_S4": "rerun49_43_S4_2500_3HL_9epochs_100p00_acc_.h5",\
+"dataEnsemble_S5": "rerun49_43_S5_2500_3HL_7epochs_99p99_acc_.h5",\
+"dataEnsemble_S6": "rerun49_43_S6_2500_3HL_6epochs_99p96_acc_.h5",\
+"dataEnsemble_S7": "rerun49_43_S7_2500_3HL_17epochs_99p99_acc_.h5",\
+"dataEnsemble_S8": "rerun49_43_S8_2500_3HL_6epochs_100p00_acc_.h5",\
+"dataEnsemble_S9": "rerun49_43_S9_2500_3HL_7epochs_99p99_acc_.h5",\
+"dataEnsemble_S10": "rerun49_43_S10_1875_3HL_9epochs_99p95_acc_.h5",\
+"dataEnsemble_S11": "rerun49_43_S11_1250_3HL_8epochs_99p66_acc_.h5",\
+"dataEnsemble_S12": "rerun49_43_S12_1250_3HL_12epochs_99p78_acc_.h5"\
+}
+
+for modelConfig, modelName in modelDict.items():
+	#MmodelPath = modelDir + "/" + modelConfig + "/" + modelName
+	modelPath = modelDir + "/" + "dataEnsemble" + "/" + modelName ##Only for dataEnsemble
+	## clear_Session helps the model to clear so that we don't get the exception after loading 5 models
+	keras.backend.clear_session()
+	if (os.path.isfile(modelPath)):
+		model = load_model(modelPath)
+		print("Loaded model from\n%s" %(modelPath))
+
+		## Evaluate the performance of model on testData
+		model_score = model.evaluate(x_test[:,:inputTraces], y_test_oh, batch_size=256)
+		print("\n%s model of: %s score on testData: %s is: %s\n" %(modelConfig, modelName, testDataConfig, model_score[1]))
+		
+		## Convert from one-hot to numerical prediction
+		y_pred = np.argmax(model.predict(x_test[:,:inputTraces], batch_size=256), axis=1)
+		
+		## vstack the actual and predicted output and take transpose
+		output_predict = np.vstack((np.argmax(y_test_oh, axis=1), y_pred)).T
+		
+		## Save it to csv file for future analysis
+		## Split the modelName so that it has config and run number in the name
+		outputFile = modelDir + "/" + testDataConfig + "/"  + "testDataOf_" + testDataConfig + "_modelOf_" + "_".join(modelName.split("_")[0:4]) + "_test.csv" 
+		np.savetxt(outputFile, output_predict, fmt="%5.0f", delimiter=",")
+		
+		##Error Analysis
+		errorAnalysis(outputFile)
+
+		df = pd.read_csv(outputFile, header=None)
+		
+		error_df = df[df[0]!=df[1]].astype('category')
+		error_df[2] = error_df[0].astype(str).str.cat(error_df[1].astype(str), sep="-")
+		
+		totalCount = df[0].count()
+		errorCount = error_df[2].count()
+		accuracy = ((df[0].count()-error_df[2].count())/df[0].count())*100
+		
+		
+		## to get the accuracy of individual keys, we need to count the number of rows in error_df for the same key
+		## dubtract it from total data elements and divide it by the total number of data elements for each.
+		
+		## For example
+		#c1 = df[0][df[0] == 0].count()
+		#error_0 = error_df[0][error_df[0]==0].count()
+		#
+		#acc_0 = ((c1-error_0)/c1)*100
+		
+		## Now to loop it
+		keyAcc = pd.DataFrame(columns={'key', 'acc'})
+		
+		for key in range(256):
+			totalKey = df[0][df[0]==key].count()
+			keyErrors = error_df[0][error_df[0]==key].count()
+			acc = ((totalKey-keyErrors)/totalKey)*100
+			keyAcc.loc[key] = {'key': key, 'acc': acc}
+			#print("key= %s, acc= %s" %(key, acc))
+		
+		## Save to tsv
+		saveFile = modelDir + "/" + testDataConfig + "/"  + "testDataOf_" + testDataConfig + "_modelOf_" + "_".join(modelName.split("_")[0:4]) + "_test_keyAccuracy.tsv" 
+		keyAcc.to_csv(saveFile, sep='\t', header=True, index=False)
+		
+		##Checking for entopy calculatirerun_prev_rowStd_config3p1_22_4HL_15epochs_99p22_acc_.h5"\ons of the predictions
+		pred = model.predict(x_test[:,:inputTraces], batch_size=256)
+		
+		## np.argsort(-pred) gets the order in which the indexes will be arranged 
+		## np.argsort() of above will return the rank of the indexes with their values in the coressponding indexes
+		rank = np.argsort(np.argsort(-pred))
+		
+		## Get the actual predictions from y_test, need to convert one-hot to actual numbers
+		test_actual = np.argmax(y_test_oh, axis=1)
+		
+		## Get the prediction ranks for each prediction
+		prediction_ranks = rank[np.arange(len(test_actual)), test_actual]
+		
+		## getting the mean will also get the accuracy for the recall_at
+		## recall = 1 , will get you accuracy at one shot
+		recall_1 = np.mean(prediction_ranks < 1)
+		recall_10 = np.mean(prediction_ranks < 10)
+		recall_25 = np.mean(prediction_ranks < 25)
+		recall_40 = np.mean(prediction_ranks < 40)
+		recall_50 = np.mean(prediction_ranks < 50)
+		
+		print("model= %s\nrecall_1= %s\nrecall_10= %s\nrecall_25= %s\nrecall_40= %s\nrecall_50= %s" %(modelName, recall_1, recall_10, recall_25, recall_40, recall_50))
+		
+		## Create confusion matriux for aggregated computation
+		conf = confusion_matrix(df[0], df[1])
+		## Get the index for each row's max value. This is the column number in each row where the max value is located
+		rowArgMax = np.argmax(conf, axis=1)
+		
+		logFile = modelDir + '/../log/' + testDataConfig + '/testDataOf_' + testDataConfig + '_modelOf_'+ "_".join(modelName.split("_")[0:4]) + "_" + '{0:.2f}'.format(model_score[1]*100).replace('.', 'p') + '_acc_' + "keyAccuracy.log" 
+		
+		## Divisor so that the % is 100%.
+		## 1000 testSize -> 1 divisior
+		##  testSize -> (testSize) / 1000
+		divisor = (testSize)/1000
+		with open(logFile, 'a') as f:
+			f.write("model= %s\nrecall_1= %s\nrecall_10= %s\nrecall_25= %s\nrecall_40= %s\nrecall_50= %s\n\n" %(modelName, recall_1, recall_10, recall_25, recall_40, recall_50))
+			for row in range(256):
+				if (row != rowArgMax[row]):
+					print("key= %s (%s%% acc), maxPredKey= %s (%s%% acc)---" %(row, conf[row, row]/divisor, rowArgMax[row], conf[row, rowArgMax[row]]/divisor))
+					f.write("key= %s (%s%% acc), maxPredKey= %s (%s%% acc)---\n" %(row, conf[row, row]/divisor, rowArgMax[row], conf[row, rowArgMax[row]]/divisor))
+				else:
+					print("key= %s (%s%% acc), maxPredKey= %s (%s%% acc)" %(row, conf[row, row]/divisor, rowArgMax[row], conf[row, rowArgMax[row]]/divisor))
+					f.write("key= %s (%s%% acc), maxPredKey= %s (%s%% acc)\n" %(row, conf[row, row]/divisor, rowArgMax[row], conf[row, rowArgMax[row]]/divisor))
+
+		## Get perplexity
+		pred = model.predict(x_test[:,:inputTraces], batch_size=2048)
+		
+		test_actual_perp = np.argmax(y_test_oh, axis=1)
+		test_actual_perp = test_actual_perp.reshape(test_actual_perp.shape[0], 1) #shape should be in array form for take_along_axis
+		
+		pred_prob = np.take_along_axis(pred, test_actual_perp, 1)
+		
+		## loop to calculate perplexity
+		product = 1
+		N = pred_prob.shape[0] #Total number of test samples
+		for index in range(N):
+			## Take the n'th root of each value and then multiply them
+			product = product * np.power(pred_prob[index], (1/N))
+		
+		perplexity = 1/product
+		print("perplexity of model=%s on testData of %s is %s\n" %(modelName, testDataConfig, perplexity))
